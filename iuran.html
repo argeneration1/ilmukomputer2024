@@ -1,0 +1,373 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Pembayaran Iuran</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="login-screen" class="container mx-auto p-4">
+        <div class="flex flex-col items-center justify-center h-screen">
+            <h1 class="text-2xl font-bold mb-4">Selamat Datang</h1>
+            <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow" onclick="showAdminLogin()">Masuk sebagai Admin</button>
+                <button class="bg-green-500 text-white px-4 py-2 rounded-lg shadow" onclick="enterAsGuest()">Masuk sebagai Pengunjung</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-login-screen" class="container mx-auto p-4 hidden">
+        <div class="flex flex-col items-center justify-center h-screen">
+            <h1 class="text-2xl font-bold mb-4">Login Admin</h1>
+            <div class="w-full md:w-1/3 bg-white p-4 rounded-lg shadow-lg">
+                <div class="mb-4">
+                    <label for="admin-username" class="block mb-2 font-semibold">Username:</label>
+                    <input type="text" id="admin-username" class="border border-gray-300 rounded p-2 w-full">
+                </div>
+                <div class="mb-4">
+                    <label for="admin-password" class="block mb-2 font-semibold">Password:</label>
+                    <input type="password" id="admin-password" class="border border-gray-300 rounded p-2 w-full">
+                </div>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow w-full" onclick="adminLogin()">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-app" class="container mx-auto p-4 hidden">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-4 bg-blue-600 text-white p-4 rounded-lg shadow-lg">
+            <h1 class="text-xl md:text-2xl font-bold text-center md:text-left">DAFTAR PEMBAYARAN IURAN UANG KAS PRODI ILMU KOMPUTER</h1>
+            <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 mt-4 md:mt-0">
+                <div class="flex items-center space-x-2">
+                    <label for="bulan" class="mr-2">Bulan:</label>
+                    <select id="bulan" class="border border-gray-300 rounded p-2 text-black" onchange="refreshTable()">
+                        <option>Januari</option>
+                        <option>Februari</option>
+                        <option>Maret</option>
+                        <option>April</option>
+                        <option>Mei</option>
+                        <option>Juni</option>
+                        <option>Juli</option>
+                        <option>Agustus</option>
+                        <option>September</option>
+                        <option>Oktober</option>
+                        <option>November</option>
+                        <option>Desember</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <label for="tahun" class="mr-2">Tahun:</label>
+                    <select id="tahun" class="border border-gray-300 rounded p-2 text-black" onchange="refreshTable()">
+                        <script>
+                            for (let year = 2023; year <= 2030; year++) {
+                                document.write(`<option>${year}</option>`);
+                            }
+                        </script>
+                    </select>
+                </div>
+                <button class="bg-green-500 text-white px-4 py-2 rounded-lg shadow" onclick="saveData()">Save Data</button>
+                <button class="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow" onclick="refreshData()">Refresh</button>
+            </div>
+        </div>
+        <div class="flex flex-col md:flex-row">
+            <div class="w-full md:w-1/4 bg-white p-4 rounded-lg shadow-lg mb-4 md:mb-0">
+                <div class="mb-4">
+                    <label for="name" class="block mb-2 font-semibold">Nama:</label>
+                    <input type="text" id="name" class="border border-gray-300 rounded p-2 w-full">
+                </div>
+                <div class="mb-4">
+                    <label for="nim" class="block mb-2 font-semibold">NIM:</label>
+                    <input type="text" id="nim" class="border border-gray-300 rounded p-2 w-full">
+                </div>
+                <div class="mb-4">
+                    <label for="prodi" class="block mb-2 font-semibold">Prodi:</label>
+                    <input type="text" id="prodi" class="border border-gray-300 rounded p-2 w-full">
+                </div>
+                <div class="flex space-x-2 mb-4">
+                    <button id="add-data-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow" onclick="addStudent()">Tambah Data</button>
+                    <button id="delete-data-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow" onclick="deleteStudent()">Hapus Data</button>
+                </div>
+                <div class="mb-4">
+                    <label for="search" class="block mb-2 font-semibold">Cari (NIM/Nama):</label>
+                    <input type="text" id="search" class="border border-gray-300 rounded p-2 w-full">
+                    <button class="bg-gray-500 text-white px-4 py-2 rounded-lg shadow mt-2 w-full" onclick="searchStudent()">Cari</button>
+                </div>
+            </div>
+            <div class="w-full md:w-3/4 bg-white p-4 rounded-lg shadow-lg ml-0 md:ml-4">
+                <div class="mb-4">
+                    <label for="input-nim" class="block mb-2 font-semibold">Masukkan NIM/Nama:</label>
+                    <input type="text" id="input-nim" class="border border-gray-300 rounded p-2 w-full">
+                </div>
+                <div class="mb-4">
+                    <label for="minggu" class="block mb-2 font-semibold">Minggu Pembayaran:</label>
+                    <select id="minggu" class="border border-gray-300 rounded p-2 w-full">
+                        <option>Minggu 1</option>
+                        <option>Minggu 2</option>
+                        <option>Minggu 3</option>
+                        <option>Minggu 4</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="jumlah" class="block mb-2 font-semibold">Jumlah Pembayaran:</label>
+                    <input type="text" id="jumlah" class="border border-gray-300 rounded p-2 w-full">
+                </div>
+                <button id="save-payment-btn" class="bg-green-500 text-white px-4 py-2 rounded-lg shadow w-full" onclick="makePayment()">Simpan Pembayaran</button>
+            </div>
+        </div>
+        <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full bg-white rounded-lg shadow-lg">
+                <thead>
+                    <tr class="bg-blue-600 text-white">
+                        <th class="border px-4 py-2">Name</th>
+                        <th class="border px-4 py-2">NIM</th>
+                        <th class="border px-4 py-2">Program</th>
+                        <th class="border px-4 py-2">Week 1</th>
+                        <th class="border px-4 py-2">Week 2</th>
+                        <th class="border px-4 py-2">Week 3</th>
+                        <th class="border px-4 py-2">Week 4</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Add rows here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const payments_data = {};
+        const adminCredentials = [
+            { username: 'arifcsc2024', password: 'arifik24' },
+            { username: 'arifcsc2025', password: 'arifik25' },
+            { username: 'arifcsc2026', password: 'arifik26' }
+        ];
+
+        function showAdminLogin() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('admin-login-screen').classList.remove('hidden');
+        }
+
+        function adminLogin() {
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+
+            const isValidAdmin = adminCredentials.some(admin => admin.username === username && admin.password === password);
+
+            if (isValidAdmin) {
+                document.getElementById('admin-login-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                enableAdminFeatures();
+            } else {
+                alert('Username atau password salah!');
+            }
+        }
+
+        function enterAsGuest() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            disableAdminFeatures();
+        }
+
+        function enableAdminFeatures() {
+            document.getElementById('add-data-btn').disabled = false;
+            document.getElementById('delete-data-btn').disabled = false;
+            document.getElementById('save-payment-btn').disabled = false;
+        }
+
+        function disableAdminFeatures() {
+            document.getElementById('add-data-btn').disabled = true;
+            document.getElementById('delete-data-btn').disabled = true;
+            document.getElementById('save-payment-btn').disabled = true;
+        }
+
+        function addStudent() {
+            const name = document.getElementById('name').value;
+            const nim = document.getElementById('nim').value;
+            const prodi = document.getElementById('prodi').value;
+            const bulan = document.getElementById('bulan').value;
+            const tahun = document.getElementById('tahun').value;
+            const key = `${bulan} ${tahun}`;
+
+            if (!name || !nim || !prodi) {
+                alert('Semua kolom harus diisi!');
+                return;
+            }
+
+            if (!payments_data[key]) {
+                payments_data[key] = [];
+            }
+
+            const studentExists = payments_data[key].some(student => student.nim === nim);
+
+            if (studentExists) {
+                alert('Siswa dengan NIM ini sudah ada untuk bulan dan tahun yang dipilih.');
+                return;
+            }
+
+            payments_data[key].push({
+                name,
+                nim,
+                prodi,
+                week1: 0,
+                week2: 0,
+                week3: 0,
+                week4: 0
+            });
+
+            document.getElementById('name').value = '';
+            document.getElementById('nim').value = '';
+            document.getElementById('prodi').value = '';
+
+            refreshTable();
+            alert('Siswa berhasil ditambahkan.');
+        }
+
+        function deleteStudent() {
+            const nim = document.getElementById('nim').value;
+            const bulan = document.getElementById('bulan').value;
+            const tahun = document.getElementById('tahun').value;
+            const key = `${bulan} ${tahun}`;
+
+            if (!nim || !bulan || !tahun) {
+                alert('NIM, bulan, dan tahun harus diisi!');
+                return;
+            }
+
+            if (!payments_data[key]) {
+                alert('Data tidak ditemukan.');
+                return;
+            }
+
+            const initialLength = payments_data[key].length;
+            payments_data[key] = payments_data[key].filter(student => student.nim !== nim);
+
+            if (payments_data[key].length === initialLength) {
+                alert('Siswa tidak ditemukan.');
+            } else {
+                refreshTable();
+                alert('Siswa berhasil dihapus.');
+            }
+        }
+
+        function saveData() {
+            const bulan = document.getElementById('bulan').value;
+            const tahun = document.getElementById('tahun').value;
+            const key = `${bulan} ${tahun}`;
+
+            if (!payments_data[key]) {
+                alert('Tidak ada data untuk disimpan.');
+                return;
+            }
+
+            localStorage.setItem(key, JSON.stringify(payments_data[key]));
+            alert('Data berhasil disimpan.');
+        }
+
+        function refreshData() {
+            const bulan = document.getElementById('bulan').value;
+            const tahun = document.getElementById('tahun').value;
+            const key = `${bulan} ${tahun}`;
+
+            const data = localStorage.getItem(key);
+
+            if (data) {
+                payments_data[key] = JSON.parse(data);
+                refreshTable();
+                alert('Data berhasil dimuat.');
+            } else {
+                alert('Data tidak ditemukan.');
+            }
+        }
+
+        function makePayment() {
+            const nimOrName = document.getElementById('input-nim').value;
+            const bulan = document.getElementById('bulan').value;
+            const tahun = document.getElementById('tahun').value;
+            const minggu = document.getElementById('minggu').value;
+            const jumlah = parseInt(document.getElementById('jumlah').value);
+            const key = `${bulan} ${tahun}`;
+
+            if (!nimOrName || !bulan || !tahun || !minggu || isNaN(jumlah)) {
+                alert('Semua kolom harus diisi dengan benar!');
+                return;
+            }
+
+            if (!payments_data[key]) {
+                alert('Data tidak ditemukan.');
+                return;
+            }
+
+            const student = payments_data[key].find(student => student.nim === nimOrName || student.name === nimOrName);
+
+            if (!student) {
+                alert('Siswa tidak ditemukan.');
+                return;
+            }
+
+            student[`week${minggu.split(' ')[1]}`] = jumlah;
+
+            refreshTable();
+            alert('Pembayaran berhasil disimpan.');
+        }
+
+        function refreshTable() {
+            const bulan = document.getElementById('bulan').value;
+            const tahun = document.getElementById('tahun').value;
+            const key = `${bulan} ${tahun}`;
+            const tableBody = document.getElementById('table-body');
+
+            tableBody.innerHTML = '';
+
+            if (!payments_data[key]) {
+                return;
+            }
+
+            payments_data[key].forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="border px-4 py-2">${student.name}</td>
+                    <td class="border px-4 py-2">${student.nim}</td>
+                    <td class="border px-4 py-2">${student.prodi}</td>
+                    <td class="border px-4 py-2">${student.week1}</td>
+                    <td class="border px-4 py-2">${student.week2}</td>
+                    <td class="border px-4 py-2">${student.week3}</td>
+                    <td class="border px-4 py-2">${student.week4}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function searchStudent() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const bulan = document.getElementById('bulan').value;
+            const tahun = document.getElementById('tahun').value;
+            const key = `${bulan} ${tahun}`;
+            const tableBody = document.getElementById('table-body');
+
+            tableBody.innerHTML = '';
+
+            if (!payments_data[key]) {
+                return;
+            }
+
+            const filteredData = payments_data[key].filter(student => 
+                student.name.toLowerCase().includes(searchTerm) || student.nim.toLowerCase().includes(searchTerm)
+            );
+
+            filteredData.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="border px-4 py-2">${student.name}</td>
+                    <td class="border px-4 py-2">${student.nim}</td>
+                    <td class="border px-4 py-2">${student.prodi}</td>
+                    <td class="border px-4 py-2">${student.week1}</td>
+                    <td class="border px-4 py-2">${student.week2}</td>
+                    <td class="border px-4 py-2">${student.week3}</td>
+                    <td class="border px-4 py-2">${student.week4}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
